@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import { useState } from "react";
 import {
@@ -61,7 +61,7 @@ function DashboardPage() {
       <div className="min-h-screen bg-base-300">
         <Navbar />
         <WelcomeSection onCreateSession={() => setShowCreateModal(true)} />
-        Grid layout
+        {/* Grid layout */}
         <div className="container mx-auto px-6 pb-16">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <StatsCards

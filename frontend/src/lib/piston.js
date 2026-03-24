@@ -1,6 +1,9 @@
-// Piston API is a service for code execution
-
-const PISTON_API = "https://emkc.org/api/v2/piston";
+// Piston API is a service for code execution.
+// Note: the public instance (emkc.org) became whitelist-only in 2026.
+const PISTON_API = (import.meta.env.VITE_PISTON_API_URL || "https://emkc.org/api/v2/piston").replace(
+  /\/$/,
+  ""
+);
 
 const LANGUAGE_VERSIONS = {
   javascript: { language: "javascript", version: "18.15.0" },
@@ -17,7 +20,8 @@ export async function executeCode(language, code) {
   try {
     const languageConfig = LANGUAGE_VERSIONS[language];
 
-    if (!languageConfig) { // if the language is not from the options 
+    // if the language is not from the options
+    if (!languageConfig) {
       return {
         success: false,
         error: `Unsupported language: ${language}`,
@@ -41,14 +45,33 @@ export async function executeCode(language, code) {
       }),
     });
 
+    let data = null;
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
+    }
+
     if (!response.ok) {
+      const message =
+        data?.message ||
+        data?.error ||
+        (typeof data === "string" ? data : null) ||
+        `Code execution service returned ${response.status}`;
+
       return {
         success: false,
-        error: `HTTP error! status: ${response.status}`,
+        error: message,
       };
     }
 
-    const data = await response.json();
+    // Public Piston returns an object like { message: "..." } when access is denied.
+    if (data?.message && !data?.run) {
+      return {
+        success: false,
+        error: data.message,
+      };
+    }
 
     const output = data.run.output || "";
     const stderr = data.run.stderr || "";

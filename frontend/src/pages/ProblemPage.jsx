@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router-dom";
 import { PROBLEMS } from "../data/problems";
 import Navbar from "../components/Navbar";
 
@@ -105,7 +105,7 @@ function ProblemPage() {
         toast.error("Tests failed. Check your output!");
       }
     } else {
-      toast.error("Code execution failed!");
+      toast.error(result.error || "Code execution failed!");
     }
   };
 
